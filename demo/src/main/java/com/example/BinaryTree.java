@@ -11,7 +11,7 @@ public class BinaryTree<K extends Comparable<K>,V> {
         root = null;
     }
 
-    public static BinaryTree<String, String> buildDictionary(String filePath) {
+    public static BinaryTree<String, String> delDictionary(String filePath) {
         BinaryTree<String, String> dictionary = new BinaryTree<>();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -31,74 +31,73 @@ public class BinaryTree<K extends Comparable<K>,V> {
     }
 
     public static String translator(String inputFilePath, BinaryTree<String, String> dictionary) {
-        StringBuilder translatedText = new StringBuilder();
+        StringBuilder traducido = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(inputFilePath));
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] words = line.split("\\s+");
-                for (String word : words) {
+                String[] palabras = line.split("\\s+");
+                for (String word : palabras) {
                     String[] parts = word.split("(?<=\\p{Punct})|(?=\\p{Punct})");
                     for (String part : parts) {
                         if (part.matches("\\p{Punct}")) {
-                            translatedText.append(part);
+                            traducido.append(part);
                         } else {
                             String translatedPart = dictionary.search(part.toLowerCase());
                             if (translatedPart != null)
-                                translatedText.append(translatedPart).append(" ");
+                                traducido.append(translatedPart).append(" ");
                             else
-                                translatedText.append("*").append(part).append("* ");
+                                traducido.append("*").append(part).append("* ");
                         }
                     }
-                    translatedText.append(" ");
+                    traducido.append(" ");
                 }
-                translatedText.append("\n");
+                traducido.append("\n");
             }
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return translatedText.toString().trim();
+        return traducido.toString().trim();
     }
 
-    private Nodo<K, V> insertRecursive(Nodo<K, V> root, Association<K, V> association) {
+    private Nodo<K, V> Recursivo(Nodo<K, V> root, Association<K, V> association) {
         if (root == null) {
             root = new Nodo<>(association);
             return root;
         }
         if (association.key.compareTo(root.data.key) < 0)
-            root.left = insertRecursive(root.left, association);
+            root.left = Recursivo(root.left, association);
         else if (association.key.compareTo(root.data.key) > 0)
-            root.right = insertRecursive(root.right, association);
+            root.right = Recursivo(root.right, association);
         return root;
     }
 
     public void insertar(Association<K, V> association) {
-        root = insertRecursive(root, association);
+        root = Recursivo(root, association);
     }
 
-    private void inorderTraversalRecursive(Nodo<K, V> root) {
+    private void RecursivoEnOrden(Nodo<K, V> root) {
         if (root != null) {
-            inorderTraversalRecursive(root.left);
-            System.out.println("(" + root.data.key + ", " + root.data.value + ")");
-            inorderTraversalRecursive(root.right);
+            RecursivoEnOrden(root.left);
+            RecursivoEnOrden(root.right);
         }
     }
 
-    public void inorderTraversal() {
-        inorderTraversalRecursive(root);
+    public void Traversal() {
+        RecursivoEnOrden(root);
     }
 
-    private V searchRecursive(Nodo<K, V> root, K key) {
+    private V BuscarEnRecursivo(Nodo<K, V> root, K key) {
         if (root == null || root.data.key.equals(key))
             return root != null ? root.data.value : null;
         if (key.compareTo(root.data.key) < 0)
-            return searchRecursive(root.left, key);
+            return BuscarEnRecursivo(root.left, key);
         else
-            return searchRecursive(root.right, key);
+            return BuscarEnRecursivo(root.right, key);
     }
 
     public V search(K key) {
-        return searchRecursive(root, key);
+        return BuscarEnRecursivo(root, key);
     }
 }
