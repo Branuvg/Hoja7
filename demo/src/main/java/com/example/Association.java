@@ -1,4 +1,5 @@
 package com.example;
+
 public class Association<K,V> {
     K key;
     V value;
